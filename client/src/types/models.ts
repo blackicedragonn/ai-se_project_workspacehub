@@ -76,3 +76,7 @@ export interface MePayload {
   user: User;
   organization: Organization;
 }
+
+export type ProjectCreatePayload = Pick<Project, "name" | "description">;
+
+export type ProjectUpdatePayload = Partial<ProjectCreatePayload>;

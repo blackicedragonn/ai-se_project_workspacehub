@@ -5,40 +5,45 @@ import type { BookingFormState } from "../pages/BookingsPage";
 // model and every other model in this project enforce no minlength at all.
 const MIN_TITLE_LENGTH = 3;
 
+export type BookingFormErrors = Partial<Record<keyof BookingFormState, string>>;
+
 export const validateBookingFormState = (
   form: BookingFormState,
-): string | null => {
+): BookingFormErrors => {
+  const errors: BookingFormErrors = {};
   const trimmedTitle = form.title.trim();
 
   if (!trimmedTitle) {
-    return "Title is required.";
+    errors.title = "Title is required.";
+  } else if (trimmedTitle.length < MIN_TITLE_LENGTH) {
+    errors.title = `Title must be at least ${MIN_TITLE_LENGTH} characters.`;
   }
 
-  if (trimmedTitle.length < MIN_TITLE_LENGTH) {
-    return `Title must be at least ${MIN_TITLE_LENGTH} characters.`;
-  }
-
+  let startsAt: Date | null = null;
   if (!form.startsAt) {
-    return "Start time is required.";
+    errors.startsAt = "Start time is required.";
+  } else {
+    startsAt = new Date(form.startsAt);
+    if (Number.isNaN(startsAt.getTime())) {
+      errors.startsAt = "Start time must be a valid date.";
+      startsAt = null;
+    }
   }
 
-  const startsAt = new Date(form.startsAt);
-  if (Number.isNaN(startsAt.getTime())) {
-    return "Start time must be a valid date.";
-  }
-
+  let endsAt: Date | null = null;
   if (!form.endsAt) {
-    return "End time is required.";
+    errors.endsAt = "End time is required.";
+  } else {
+    endsAt = new Date(form.endsAt);
+    if (Number.isNaN(endsAt.getTime())) {
+      errors.endsAt = "End time must be a valid date.";
+      endsAt = null;
+    }
   }
 
-  const endsAt = new Date(form.endsAt);
-  if (Number.isNaN(endsAt.getTime())) {
-    return "End time must be a valid date.";
+  if (startsAt && endsAt && endsAt.getTime() <= startsAt.getTime()) {
+    errors.endsAt = "End time must be after the start time.";
   }
 
-  if (endsAt.getTime() <= startsAt.getTime()) {
-    return "End time must be after the start time.";
-  }
-
-  return null;
+  return errors;
 };

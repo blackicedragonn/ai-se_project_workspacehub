@@ -11,6 +11,13 @@
     "dev:server": "npm run dev --workspace server",
     "build": "npm run build --workspace server && npm run build --workspace client",
     "typecheck": "npm run typecheck --workspace client && npm run typecheck --workspace server",
-    "seed": "npm run seed --workspace server"
+    "seed": "npm run seed --workspace server",
+    "lint": "npm run lint --workspace client && npm run lint --workspace server",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run test --workspace client"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
   }
 }
