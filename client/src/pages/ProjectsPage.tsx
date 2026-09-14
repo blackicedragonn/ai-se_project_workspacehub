@@ -5,7 +5,7 @@ import { StatusPanel } from "../components/StatusPanel";
 import { projectService } from "../services/projectService";
 import type { Project } from "../types/models";
 import { useAuth } from "../hooks/useAuth";
-import { canDeleteResources } from "../utils/permissions";
+import { canCreateProject, canDeleteResources } from "../utils/permissions";
 
 export const ProjectsPage = () => {
   const { user } = useAuth();
@@ -13,17 +13,18 @@ export const ProjectsPage = () => {
   const [formState, setFormState] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const loadProjects = async () => {
     setLoading(true);
-    setError(null);
+    setLoadError(null);
 
     try {
       const nextProjects = await projectService.list();
       setProjects(nextProjects);
     } catch (error) {
-      setError(
+      setLoadError(
         error instanceof Error ? error.message : "Unable to load projects",
       );
     } finally {
@@ -38,14 +39,14 @@ export const ProjectsPage = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSaving(true);
-    setError(null);
+    setActionError(null);
 
     try {
       const project = await projectService.create(formState);
       setProjects((current) => [project, ...current]);
       setFormState({ name: "", description: "" });
     } catch (submitError) {
-      setError(
+      setActionError(
         submitError instanceof Error
           ? submitError.message
           : "Unable to create project",
@@ -62,7 +63,7 @@ export const ProjectsPage = () => {
         current.filter((project) => project._id !== projectId),
       );
     } catch (deleteError) {
-      setError(
+      setActionError(
         deleteError instanceof Error
           ? deleteError.message
           : "Unable to delete project",
@@ -76,6 +77,10 @@ export const ProjectsPage = () => {
     );
   }
 
+  if (loadError) {
+    return <StatusPanel title="Projects unavailable" message={loadError} />;
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -83,44 +88,53 @@ export const ProjectsPage = () => {
         title="Projects"
       />
       <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <form
-          className="rounded-3xl bg-white p-6 shadow-sm"
-          onSubmit={handleSubmit}
-        >
-          <h2 className="text-xl font-semibold text-ink">Create project</h2>
-          <div className="mt-4 space-y-4">
-            <input
-              className="w-full rounded-2xl border border-slate-200 transition hover:border-slate-300 px-4 py-3 placeholder:text-[#94A3B880]"
-              onChange={(event) =>
-                setFormState((current) => ({
-                  ...current,
-                  name: event.target.value,
-                }))
-              }
-              placeholder="Project name"
-              value={formState.name}
-            />
-            <textarea
-              className="min-h-32 w-full rounded-2xl border border-slate-200 transition hover:border-slate-300 px-4 py-3 placeholder:text-[#94A3B880]"
-              onChange={(event) =>
-                setFormState((current) => ({
-                  ...current,
-                  description: event.target.value,
-                }))
-              }
-              placeholder="Description"
-              value={formState.description}
-            />
-            {error ? <p className="text-sm text-danger">{error}</p> : null}
-            <button
-              className="rounded-[12px] bg-ink px-4 py-3 font-medium text-white transition hover:opacity-80 active:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={saving}
-              type="submit"
-            >
-              {saving ? "Creating..." : "Create project"}
-            </button>
-          </div>
-        </form>
+        {canCreateProject(user) ? (
+          <form
+            className="rounded-3xl bg-white p-6 shadow-sm"
+            onSubmit={handleSubmit}
+          >
+            <h2 className="text-xl font-semibold text-ink">Create project</h2>
+            <div className="mt-4 space-y-4">
+              <input
+                className="w-full rounded-2xl border border-slate-200 transition hover:border-slate-300 px-4 py-3 placeholder:text-[#94A3B880]"
+                onChange={(event) =>
+                  setFormState((current) => ({
+                    ...current,
+                    name: event.target.value,
+                  }))
+                }
+                placeholder="Project name"
+                value={formState.name}
+              />
+              <textarea
+                className="min-h-32 w-full rounded-2xl border border-slate-200 transition hover:border-slate-300 px-4 py-3 placeholder:text-[#94A3B880]"
+                onChange={(event) =>
+                  setFormState((current) => ({
+                    ...current,
+                    description: event.target.value,
+                  }))
+                }
+                placeholder="Description"
+                value={formState.description}
+              />
+              {actionError ? (
+                <p className="text-sm text-danger">{actionError}</p>
+              ) : null}
+              <button
+                className="rounded-[12px] bg-ink px-4 py-3 font-medium text-white transition hover:opacity-80 active:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={saving}
+                type="submit"
+              >
+                {saving ? "Creating..." : "Create project"}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <StatusPanel
+            title="Project creation restricted"
+            message="Only owners and admins can create new projects from this page."
+          />
+        )}
         {projects.length ? (
           <ul className="space-y-4">
             {projects.map((project) => (

@@ -6,8 +6,9 @@ import { bookingService } from "../services/bookingService";
 import type { Booking } from "../types/models";
 import { formatDateTimeInput } from "../utils/date";
 import { canDeleteResources, canEditBooking } from "../utils/permissions";
+import { validateBookingFormState } from "../utils/bookingValidation";
 
-interface BookingFormState {
+export interface BookingFormState {
   title: string;
   description: string;
   startsAt: string;
@@ -77,6 +78,12 @@ export const BookingsPage = () => {
   const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const validationError = validateBookingFormState(createState);
+    if (validationError) {
+      setCreateError(validationError);
+      return;
+    }
+
     try {
       const booking = await bookingService.create(createState);
       setBookings((current) =>
@@ -119,10 +126,21 @@ export const BookingsPage = () => {
   };
 
   const handleSave = async (bookingId: string) => {
+    const formState = bookingEdits[bookingId];
+
+    const validationError = validateBookingFormState(formState);
+    if (validationError) {
+      setBookingErrors((current) => ({
+        ...current,
+        [bookingId]: validationError,
+      }));
+      return;
+    }
+
     try {
       const updatedBooking = await bookingService.update(
         bookingId,
-        bookingEdits[bookingId],
+        formState,
       );
       setBookings((current) =>
         current.map((booking) =>

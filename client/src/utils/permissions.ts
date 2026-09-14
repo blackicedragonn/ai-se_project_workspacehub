@@ -4,6 +4,10 @@ export const isPrivilegedRole = (role?: UserRole | null) => {
   return role === "owner" || role === "admin";
 };
 
+export const canCreateProject = (user: User | null) => {
+  return isPrivilegedRole(user?.role);
+};
+
 export const canEditProject = (user: User | null, project: Project) => {
   if (!user) {
     return false;
