@@ -8,6 +8,7 @@ import {
 } from "../controllers/taskController";
 import { requireAuth } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
+import commentRoutes from "./commentRoutes";
 
 const router = Router();
 
@@ -18,5 +19,7 @@ router.post("/", asyncHandler(createTaskController));
 router.get("/:id", asyncHandler(getTaskController));
 router.patch("/:id", asyncHandler(updateTaskController));
 router.delete("/:id", asyncHandler(deleteTaskController));
+
+router.use("/:id/comments", commentRoutes);
 
 export default router;
