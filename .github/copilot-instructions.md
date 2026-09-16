@@ -15,9 +15,13 @@ WorkspaceHub is a full-stack project and task tracker: an Express/Mongoose API a
 - `server/src/models/`: Mongoose schemas. Types are derived with
   `InferSchemaType<typeof schema> & { _id: Types.ObjectId }` — never hand-write a matching interface.
 - register models using the document as a type parameter `model<XDocument>("X", xSchema)`. For example:
-    - `export const Task = model<TaskDocument>("Task", taskSchema);`
+  - `export const Task = model<TaskDocument>("Task", taskSchema);`
 - `server/src/routes/` → `server/src/controllers/` → `server/src/services/`:
-  the three backend layers. Routes wire up middleware and call `asyncHandler(controller)`; controllers extract request data, call a service, and respond with `sendSuccess(res, data)`; services hold business logic, database calls, and permission checks.
+  the three backend layers.
+  - **Authentication:** protect resource routes with `router.use(asyncHandler(requireAuth))` (see `taskRoutes.ts`).
+  - **Error handling:** wrap every route handler in `asyncHandler(...)` so Promise rejections reach the global error handler — no per-controller try/catch.
+  - **Responses:** controllers call `sendSuccess(res, data)` (and optional status like `201`); never raw `res.json()`.
+  - Controllers extract request data, call a service, and return `sendSuccess`; services hold business logic, database calls, and permission checks.
 - `server/src/services/permissionService.ts`: every `canManage*` authorization check lives here, not in individual services or controllers.
 - `client/src/types/models.ts`: frontend model and payload types. Update payloads are `Partial<CreatePayload>`, derived from the narrower create payload — never `Partial` of the full model.
 - `client/src/services/*Service.ts`: one file per resource, each function wrapped in `unwrapResponse`.
