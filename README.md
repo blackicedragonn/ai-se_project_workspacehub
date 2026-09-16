@@ -2,7 +2,7 @@
 
 WorkspaceHub is a full-stack multi-tenant workspace app for organizations: teams manage projects, tasks (with comments), bookings, members, and feature flags under role-based access control.
 
-**Live:** _(Add your Vercel frontend `-git-` URL after deploy)_
+**Live:** <https://workspacehub-client-git-workspacehub-part-2-workspace-hub.vercel.app>
 
 ## Features
 
