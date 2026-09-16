@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "seed": "node --import tsx src/scripts/seed.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint ."
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -27,6 +28,11 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.18.2"
   }
 }
