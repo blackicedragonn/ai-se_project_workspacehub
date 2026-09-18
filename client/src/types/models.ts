@@ -80,3 +80,17 @@ export interface MePayload {
 export type ProjectCreatePayload = Pick<Project, "name" | "description">;
 
 export type ProjectUpdatePayload = Partial<ProjectCreatePayload>;
+
+export interface Comment {
+  _id: string;
+  organizationId: string;
+  taskId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CommentCreatePayload = Pick<Comment, "content">;
+
+export type CommentUpdatePayload = Partial<CommentCreatePayload>;

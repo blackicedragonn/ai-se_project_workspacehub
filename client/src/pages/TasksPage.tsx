@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { PageHeader } from "../components/PageHeader";
 import { StatusPanel } from "../components/StatusPanel";
+import { TaskComments } from "../components/TaskComments";
 import { useAuth } from "../hooks/useAuth";
 import { projectService } from "../services/projectService";
 import { taskService } from "../services/taskService";
@@ -452,6 +453,7 @@ export const TasksPage = () => {
                         </button>
                       ) : null}
                     </div>
+                    <TaskComments taskId={task._id} users={users} />
                   </article>
                 </li>
               );
