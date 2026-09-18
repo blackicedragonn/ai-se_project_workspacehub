@@ -4,6 +4,8 @@ WorkspaceHub is a full-stack multi-tenant workspace app for organizations: teams
 
 **Live:** <https://workspacehub-client-git-workspacehub-part-2-workspace-hub.vercel.app>
 
+**API:** <https://workspacehub-api-git-workspacehub-part-2-workspace-hub.vercel.app/api/health>
+
 ## Features
 
 - Multi-tenant organizations with owner, admin, and member roles
